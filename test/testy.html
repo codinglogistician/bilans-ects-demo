@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Testy: bilans-ects</title>
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; margin: 32px; color: #1B2430; }
+    li { margin: 6px 0; font-size: 15px; }
+    .ok { color: #1E7A46; } .blad { color: #B3261E; }
+    .opis { color: #5A6673; font-size: 13px; margin-left: 22px; }
+    h1 { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Testy aplikacji bilans-ects</h1>
+  <p id="podsumowanie"></p>
+  <ul id="lista"></ul>
+
+  <script src="../app/dane.js"></script>
+  <script src="../app/ects.js"></script>
+  <script src="mini-test.js"></script>
+  <script src="testy.js"></script>
+  <script>
+    const lista = document.getElementById("lista");
+    let bledy = 0;
+    MiniTest.wyniki.forEach((w) => {
+      const li = document.createElement("li");
+      li.className = w.ok ? "ok" : "blad";
+      li.innerHTML = (w.ok ? "✔ " : "✘ ") + w.nazwa + (w.ok ? "" : "<div class='opis'>" + w.blad + "</div>");
+      if (!w.ok) bledy++;
+      lista.appendChild(li);
+    });
+    document.getElementById("podsumowanie").textContent =
+      (MiniTest.wyniki.length - bledy) + " / " + MiniTest.wyniki.length + " testów zaliczonych";
+  </script>
+</body>
+</html>
