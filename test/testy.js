@@ -4,6 +4,7 @@
  */
 (function () {
   const { test, rowne } = MiniTest;
+  const blad = (fn) => { try { fn(); } catch (e) { return e.message; } return null; };
   const znajdz = (kod) => PRZEDMIOTY.find((p) => p.kod === kod);
 
   test("Logistyka dystrybucji: suma godzin = 140", () => {
@@ -28,5 +29,25 @@
 
   test("formatujGodziny: 7.5 → \"7,5\"", () => {
     rowne(ECTS.formatujGodziny(7.5), "7,5");
+  });
+
+  test("Podstawy zarządzania: razem 115 h, kontaktowe 40 h, praca własna 75 h", () => {
+    const a = znajdz("PODST-ZARZ") ? znajdz("PODST-ZARZ").aktywnosci
+      : PRZEDMIOTY.find((p) => p.nazwa === "Podstawy zarządzania").aktywnosci;
+    rowne(ECTS.sumaGodzin(a), 115);
+    rowne(ECTS.godzinyKontaktowe(a), 40);
+    rowne(ECTS.godzinyWlasne(a), 75);
+  });
+
+  test("parsujGodziny: tekst \"15\" i \"7,5\" liczą się poprawnie", () => {
+    rowne(ECTS.parsujGodziny("15", "x"), 15);
+    rowne(ECTS.parsujGodziny("7,5", "x"), 7.5);
+  });
+
+  test("parsujGodziny: \"\" i \"dwa\" dają komunikat z nazwą formy", () => {
+    const m1 = blad(() => ECTS.sumaGodzin([{ forma: "Lektura", kategoria: "wlasna", godziny: "" }]));
+    const m2 = blad(() => ECTS.sumaGodzin([{ forma: "Konsultacje", kategoria: "kontaktowe", godziny: "dwa" }]));
+    rowne(m1 !== null && m1.includes("Lektura"), true);
+    rowne(m2 !== null && m2.includes("Konsultacje"), true);
   });
 })();

@@ -91,15 +91,22 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById("kontaktowe").textContent = ECTS.formatujGodziny(ECTS.godzinyKontaktowe(p.aktywnosci)) + " h";
-      document.getElementById("wlasne").textContent = ECTS.formatujGodziny(ECTS.godzinyWlasne(p.aktywnosci)) + " h";
-      document.getElementById("suma").textContent = ECTS.formatujGodziny(ECTS.sumaGodzin(p.aktywnosci)) + " h";
       document.getElementById("ects").textContent = p.ects;
-
-      const wynik = ECTS.sprawdzBilans(p);
       const status = document.getElementById("status");
-      status.className = "status " + wynik.status;
-      status.textContent = wynik.komunikat;
+      try {
+        document.getElementById("kontaktowe").textContent = ECTS.formatujGodziny(ECTS.godzinyKontaktowe(p.aktywnosci)) + " h";
+        document.getElementById("wlasne").textContent = ECTS.formatujGodziny(ECTS.godzinyWlasne(p.aktywnosci)) + " h";
+        document.getElementById("suma").textContent = ECTS.formatujGodziny(ECTS.sumaGodzin(p.aktywnosci)) + " h";
+        const wynik = ECTS.sprawdzBilans(p);
+        status.className = "status " + wynik.status;
+        status.textContent = wynik.komunikat;
+      } catch (e) {
+        ["kontaktowe", "wlasne", "suma"].forEach((id) => {
+          document.getElementById(id).textContent = "–";
+        });
+        status.className = "status blad";
+        status.textContent = e.message;
+      }
     }
 
     wybor.addEventListener("change", () => pokaz(wybor.value));
