@@ -7,10 +7,29 @@
     godzinNaEcts: 25 // przelicznik przyjęty na uczelni
   };
 
+  // Zamienia godziny (liczba albo tekst z Excela, np. "15", "7,5") na liczbę.
+  // Gdy się nie da, rzuca błąd z nazwą formy aktywności.
+  function parsujGodziny(wartosc, forma) {
+    let liczba = NaN;
+    if (typeof wartosc === "number") {
+      liczba = wartosc;
+    } else if (typeof wartosc === "string" && wartosc.trim() !== "") {
+      const tekst = wartosc.trim().replace(",", ".");
+      if (/^\d+(\.\d+)?$/.test(tekst)) liczba = Number(tekst);
+    }
+    if (!Number.isFinite(liczba) || liczba < 0) {
+      throw new Error(
+        "Nie można odczytać godzin dla formy „" + forma + "”: " +
+        (wartosc === "" ? "pusta wartość" : "„" + wartosc + "”") + "."
+      );
+    }
+    return liczba;
+  }
+
   function sumaGodzin(aktywnosci) {
     let suma = 0;
     for (const a of aktywnosci) {
-      suma = suma + a.godziny;
+      suma = suma + parsujGodziny(a.godziny, a.forma);
     }
     return suma;
   }
@@ -50,6 +69,7 @@
 
   root.ECTS = {
     KONFIG,
+    parsujGodziny,
     sumaGodzin,
     godzinyKontaktowe,
     godzinyWlasne,
